@@ -10,3 +10,6 @@
 
 # Build folder
 /build/
+
+# PyPi config
+.pypirc
