@@ -11,7 +11,7 @@ def readme():
 
 
 setup(name='fuzzybit',
-      version='0.1.0',
+      version='0.1.1',
       description='Fuzzy bit library',
       long_description=readme(),
       classifiers=[
