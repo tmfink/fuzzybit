@@ -9,6 +9,10 @@ class InsufficientHistoryException(Exception):
     pass
 
 
+class InvalidArgumentException(Exception):
+    """ Indicates that the type or value of an argument was not valid."""
+    pass
+
 class FuzzyObject(object):
     """Abstract parent class for Fuzzy objects"""
 
@@ -42,9 +46,19 @@ class FuzzyBit(FuzzyObject):
                 self.observe_value(item)
 
     def observe_value(self, just_seen):
-        """Add bit to history"""
+        """
+        Add bit to history.
+
+        just_seen may be a str of length 1 ('0' or '1') or
+        an integer (0 or 1).
+        """
+
+        # Convert int to str
+        if isinstance(just_seen, int):
+            just_seen = str(just_seen)
+
         if just_seen not in ['0', '1']:
-            raise Exception('Must be 0 or 1')
+            raise InvalidArgumentException('Must be 0 or 1, as a str or int')
 
         if self._value == '?':
             # First value seen
@@ -80,7 +94,7 @@ class FuzzyInt(FuzzyObject):
 
     def __init__(self, bit_size, history=None):
         if bit_size <= 0:
-            raise Exception("Fuzzy integer must have positive length")
+            raise InvalidArgumentException("Fuzzy integer must have positive length")
 
         self._bit_size = bit_size
 
@@ -93,11 +107,20 @@ class FuzzyInt(FuzzyObject):
                 self.observe_value(item)
 
     def observe_value(self, just_seen):
-        """Observe integer value just_seen"""
+        """
+        Observe integer value just_seen.
+
+        just_seen may be an integer type or an iterable of bit values, where
+        each bit is a str of size one or an integer.
+        """
+
+        # Convert just_seen to iterable if it is an integer
+        if isinstance(just_seen, int):
+            just_seen = ['1' if just_seen & (1 << i) else '0'
+                         for i in range(self._bit_size)]
 
         for i in range(self._bit_size):
-            seen_bit = '1' if just_seen & (1 << i) else '0'
-            self._bits[i].observe_value(seen_bit)
+            self._bits[i].observe_value(just_seen[i])
 
     def get_value(self):
         """Return string of FuzzyBits with most significant bits first"""

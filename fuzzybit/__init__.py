@@ -1,1 +1,4 @@
-from fuzzybit import FuzzyBit, FuzzyInt, InsufficientHistoryException
+from fuzzybit import (
+        FuzzyBit, FuzzyInt,
+        InsufficientHistoryException, InvalidArgumentException
+        )

@@ -2,7 +2,10 @@
 
 
 from unittest import TestCase
-from fuzzybit import FuzzyBit, FuzzyInt, InsufficientHistoryException
+from fuzzybit import (
+        FuzzyBit, FuzzyInt,
+        InsufficientHistoryException, InvalidArgumentException
+        )
 
 
 class TestFuzzyBit(TestCase):
@@ -25,11 +28,8 @@ class TestFuzzyBit(TestCase):
         self.assert_history('11', '1')
 
     def test_entropy_fail(self):
-        try:
-            FuzzyBit('').get_entropy()
-        except InsufficientHistoryException:
-            return
-        self.fail("Should throw InsufficientHistoryException")
+        self.assertRaises(InsufficientHistoryException,
+                          lambda: FuzzyBit('').get_entropy())
 
     def test_entropy_none(self):
         self.assertEqual(FuzzyBit('0').get_entropy(), 0)
@@ -39,6 +39,14 @@ class TestFuzzyBit(TestCase):
         self.assertEqual(FuzzyBit('10').get_entropy(), 1)
         self.assertEqual(FuzzyBit('100').get_entropy(), 1)
         self.assertEqual(FuzzyBit('101').get_entropy(), 1)
+
+    def test_mixed_types(self):
+        self.assertEqual(FuzzyBit([0, '1', '0', 1]).get_entropy(), 1)
+
+    def test_wrong_values(self):
+        self.assertRaises(InvalidArgumentException, lambda: FuzzyBit('2'))
+        self.assertRaises(TypeError, lambda: FuzzyBit(-1))
+        self.assertRaises(InvalidArgumentException, lambda: FuzzyBit([-1]))
 
 
 class TestFuzzyInt(TestCase):
@@ -56,21 +64,26 @@ class TestFuzzyInt(TestCase):
 
     def test_hist2(self):
         self.assert_history(4, [0b0000, 0b1100], '**00')
+        self.assert_history(4, ['0000', '1100'], '**00')
         self.assert_history(4, [0b0010, 0b0110], '0*10')
 
     def test_entropy_error(self):
-        try:
-            FuzzyInt(4, []).get_entropy()
-        except InsufficientHistoryException:
-            return
-        self.fail("Should throw InsufficientHistoryException")
+        self.assertRaises(InsufficientHistoryException,
+                          lambda: FuzzyInt(4, []).get_entropy())
 
     def test_entropy_none(self):
         self.assertEqual(FuzzyInt(4, [0b0000]).get_entropy(), 0)
         self.assertEqual(FuzzyInt(4, [0b1100]).get_entropy(), 0)
         self.assertEqual(FuzzyInt(4, [0b1111]).get_entropy(), 0)
+        self.assertEqual(FuzzyInt(4, ['1111']).get_entropy(), 0)
 
     def test_entropy1(self):
         self.assertEqual(FuzzyInt(4, [0b0000, 0b1100]).get_entropy(), 2)
         self.assertEqual(FuzzyInt(4, [0b0110, 0b1100]).get_entropy(), 2)
         self.assertEqual(FuzzyInt(4, [0b0000, 0b0000, 0b0100]).get_entropy(), 1)
+        self.assertEqual(FuzzyInt(4, [0b0000, '0000', 0b0100]).get_entropy(), 1)
+
+    def test_wrong_values(self):
+        self.assertRaises(TypeError, lambda: FuzzyInt(4, -1))
+        self.assertRaises(InvalidArgumentException,
+                          lambda: FuzzyInt(4, [0b0000, '7000', 0b0100]))
