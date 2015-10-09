@@ -115,7 +115,7 @@ class FuzzyInt(FuzzyObject):
         """
 
         # Convert just_seen to iterable if it is an integer
-        if isinstance(just_seen, int):
+        if isinstance(just_seen, (int, long)):
             just_seen = ['1' if just_seen & (1 << i) else '0'
                          for i in range(self._bit_size)]
 
