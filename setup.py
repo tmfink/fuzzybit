@@ -18,7 +18,7 @@ setup(name='fuzzybit',
       description='Fuzzy bit library',
       long_description=readme(),
       classifiers=[
-          'Development Status :: 2 - Pre-Alpha',
+          'Development Status :: 3 - Alpha',
           'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
           'Programming Language :: Python :: 2.5',
           'Programming Language :: Python :: 2.6',
