@@ -13,3 +13,6 @@
 
 # PyPi config
 .pypirc
+
+# Tox folder
+/.tox
