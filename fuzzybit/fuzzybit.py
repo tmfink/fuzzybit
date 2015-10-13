@@ -1,5 +1,11 @@
 """Tracks history of observed bit values"""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
+import six
+
 
 class InsufficientHistoryException(Exception):
     """
@@ -100,7 +106,7 @@ class FuzzyInt(FuzzyObject):
 
         # Store bits such that the lowest order bits are stored first
         # (1 << i) & n is stored in _bits[i]
-        self._bits = [FuzzyBit() for _ in xrange(bit_size)]
+        self._bits = [FuzzyBit() for _ in range(bit_size)]
 
         if history != None:
             for item in history:
@@ -115,7 +121,7 @@ class FuzzyInt(FuzzyObject):
         """
 
         # Convert just_seen to iterable if it is an integer
-        if isinstance(just_seen, (int, long)):
+        if isinstance(just_seen, six.integer_types):
             just_seen = ['1' if just_seen & (1 << i) else '0'
                          for i in range(self._bit_size)]
 

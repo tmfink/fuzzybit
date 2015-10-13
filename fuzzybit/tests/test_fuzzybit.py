@@ -1,5 +1,8 @@
 """Contains tests for fuzzybit module"""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 
 from unittest import TestCase
 from fuzzybit import (

@@ -1,5 +1,8 @@
 """Setup for fuzzybit module"""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 
 from setuptools import setup
 
@@ -28,6 +31,7 @@ setup(name='fuzzybit',
       author_email='tmfink@umich.edu',
       license='GPLv3',
       packages=['fuzzybit'],
+      install_requires=['six'],
       test_suite='fuzzybit.tests.test_fuzzybit',
       include_package_data=True,
       zip_safe=True)
