@@ -24,24 +24,24 @@ def get_value_from_hex(s):
         raise Exception('Hex string must start with "0x"')
 
 
-def get_vmmap_values(get_cmd_output_lines):
+def get_vmmap_values(cmd_output_lines):
     """
     Parse vmmap command output lines
 
-    :param list[str] get_cmd_output_lines: list of vmmap output commands
+    :param list[str] cmd_output_lines: list of vmmap output commands
     :rtype: list[(int, int)]
     :return: list of parsed rows
     """
 
     return [tuple(get_value_from_hex(v) for v in x.split()[:2])
-            for x in get_cmd_output_lines()]
+            for x in cmd_output_lines]
 
 
-def get_section_names(get_cmd_output_lines):
+def get_section_names(cmd_output_lines):
     """Get name of sections"""
 
     return [' '.join(x.split()[2:])
-            for x in get_cmd_output_lines()]
+            for x in cmd_output_lines]
 
 
 def get_vmmap_entropy(vmmap_cmd, iterations=5, bit_len=64):
@@ -73,14 +73,19 @@ def get_vmmap_entropy(vmmap_cmd, iterations=5, bit_len=64):
 
         return filter(None, cmd_output.split('\n'))
 
-    section_names = get_section_names(get_cmd_output_lines)
 
-    vmmap_fuzzy_values = [(FuzzyInt(bit_len), FuzzyInt(bit_len))
-                          for _ in range(len(section_names))]
+    for i in range(iterations):
+        cmd_output_lines = get_cmd_output_lines()
 
-    for _ in range(iterations):
-        vmmap_values = get_vmmap_values(get_cmd_output_lines)
-        for ((fuzzy_start_addr, fuzzy_end_addr), (start_addr, end_addr)) in zip(
+        # Get section names on first iteration
+        if i == 0:
+            section_names = get_section_names(cmd_output_lines)
+
+            vmmap_fuzzy_values = [(FuzzyInt(bit_len), FuzzyInt(bit_len))
+                                  for _ in range(len(section_names))]
+
+        vmmap_values = get_vmmap_values(cmd_output_lines)
+        for (fuzzy_start_addr, fuzzy_end_addr), (start_addr, end_addr) in zip(
                 vmmap_fuzzy_values, vmmap_values):
             fuzzy_start_addr.observe_value(start_addr)
             fuzzy_end_addr.observe_value(end_addr)
