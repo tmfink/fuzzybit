@@ -40,7 +40,7 @@ def get_vmmap_values(get_cmd_output_lines):
 def get_section_names(get_cmd_output_lines):
     """Get name of sections"""
 
-    return [' '.join(x.split(' ')[2:])
+    return [' '.join(x.split()[2:])
             for x in get_cmd_output_lines()]
 
 
