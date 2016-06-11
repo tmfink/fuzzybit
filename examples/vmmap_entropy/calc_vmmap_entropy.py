@@ -92,8 +92,11 @@ def print_sections_entropy(fuzzy_values, section_names):
     """Print bit-level entropy of sections"""
 
     for ((start, end), name) in zip(fuzzy_values, section_names):
-        print('{} -> {}  {}'.format(start.get_value(), end.get_value(), name))
-        print('    entropy: {}, {} bits'.format(start.get_entropy(), end.get_entropy()))
+        print('{start} -> {end}  {name}\n'
+              '    entropy: {start_entropy}, {end_entropy} bits'.format(
+                  start=start.get_value(), end=end.get_value(), name=name,
+                  start_entropy=start.get_entropy(), end_entropy=end.get_entropy())
+        )
 
 
 def main():
