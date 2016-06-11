@@ -15,11 +15,14 @@ import sys
 from fuzzybit import FuzzyInt
 
 
-def get_value_from_hex(s):
+# pylint: disable=bad-builtin
+
+
+def get_value_from_hex(hex_str):
     """Convert hex string starting with 0x to an int"""
 
-    if s.startswith('0x'):
-        return int(s[2:], 16)
+    if hex_str.startswith('0x'):
+        return int(hex_str[2:], 16)
     else:
         raise Exception('Hex string must start with "0x"')
 
@@ -65,6 +68,7 @@ def get_vmmap_entropy(vmmap_cmd, iterations=5, bit_len=64):
         raise Exception('Number of sample iterations must be >= 2')
 
     def get_cmd_output_lines():
+        """Helper to get output lines from vmmap command"""
         try:
             cmd_output = subprocess.check_output(vmmap_cmd).decode()
         except subprocess.CalledProcessError:
@@ -100,8 +104,7 @@ def print_sections_entropy(fuzzy_values, section_names):
         print('{start} -> {end}  {name}\n'
               '    entropy: {start_entropy}, {end_entropy} bits'.format(
                   start=start.get_value(), end=end.get_value(), name=name,
-                  start_entropy=start.get_entropy(), end_entropy=end.get_entropy())
-        )
+                  start_entropy=start.get_entropy(), end_entropy=end.get_entropy()))
 
 
 def main():
@@ -123,8 +126,8 @@ def main():
     os.environ["PATH"] = os.getcwd() + os.pathsep + os.environ["PATH"]
 
     fuzzy_values, section_names = get_vmmap_entropy(
-            vmmap_cmd,
-            iterations=num_iterations, bit_len=args.bit_len
+        vmmap_cmd,
+        iterations=num_iterations, bit_len=args.bit_len
     )
 
     print_sections_entropy(fuzzy_values, section_names)
