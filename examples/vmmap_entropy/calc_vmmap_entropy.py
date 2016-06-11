@@ -44,7 +44,7 @@ def get_section_names(get_cmd_output_lines):
             for x in get_cmd_output_lines()]
 
 
-def get_vmmap_entropy(vmmap_cmd, iterations=5):
+def get_vmmap_entropy(vmmap_cmd, iterations=5, bit_len=64):
     """
     Get entropy of sections after given number of iterations.
 
@@ -75,7 +75,7 @@ def get_vmmap_entropy(vmmap_cmd, iterations=5):
 
     section_names = get_section_names(get_cmd_output_lines)
 
-    vmmap_fuzzy_values = [(FuzzyInt(64), FuzzyInt(64))
+    vmmap_fuzzy_values = [(FuzzyInt(bit_len), FuzzyInt(bit_len))
                           for _ in range(len(section_names))]
 
     for _ in range(iterations):
@@ -102,6 +102,8 @@ def main():
     parser = argparse.ArgumentParser(description='Process vmmap output')
     parser.add_argument('--iterations', '-i', default=5, type=int,
                         help='Number of times to run vmmap command')
+    parser.add_argument('--bit-len', '-b', default=64, type=int,
+                        help='Number of times to run vmmap command')
     parser.add_argument('command', nargs='+',
                         help='command to run to get instance of vmmap output')
     args = parser.parse_args()
@@ -112,7 +114,10 @@ def main():
     # Prepend current working directory to PATH
     os.environ["PATH"] = os.getcwd() + os.pathsep + os.environ["PATH"]
 
-    fuzzy_values, section_names = get_vmmap_entropy(vmmap_cmd, iterations=num_iterations)
+    fuzzy_values, section_names = get_vmmap_entropy(
+            vmmap_cmd,
+            iterations=num_iterations, bit_len=args.bit_len
+    )
 
     print_sections_entropy(fuzzy_values, section_names)
 
