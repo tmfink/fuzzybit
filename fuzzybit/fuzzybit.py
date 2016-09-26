@@ -6,6 +6,7 @@ from __future__ import print_function
 
 import six
 
+NIB_LEN = 4
 
 class InsufficientHistoryException(Exception):
     """
@@ -131,6 +132,41 @@ class FuzzyInt(FuzzyObject):
     def get_value(self):
         """Return string of FuzzyBits with most significant bits first"""
         return ''.join(reversed(list(b.get_value() for b in self._bits)))
+
+    def _convert_nib_to_hex(self, nib):
+        """Converts little-endian nibble to hex"""
+
+        # Convert to string
+        nib = ''.join(b.get_value() for b in nib)
+
+        # pad nib to NIB_LEN
+        if len(nib) != NIB_LEN:
+            nib = nib + '0' * (NIB_LEN - len(nib))
+
+        if '*' in nib:
+            return '*'
+        elif '?' in nib:
+            return '?'
+        else:
+            return '%x' % sum(2**i if b == '1' else 0
+                              for i, b in enumerate(nib))
+
+    def get_hex_value(self):
+        """
+        Return hexadecimal string representation of FuzzyBit where each nibble
+        corresponds to a hexadecimal character.
+
+        The following logic is used to print nibbles:
+          * If any bits are '*' --> '*'
+          * If any bits are '?' --> '?'
+          * Else nible is interpretted as normal constant
+        """
+        nibbles = []
+        for i in six.moves.xrange(0, len(self._bits), NIB_LEN):
+            nib = self._bits[i:i + NIB_LEN]
+            nibbles.append(self._convert_nib_to_hex(nib))
+
+        return ''.join(reversed(nibbles))
 
     def get_entropy(self):
         if self._bits[0].get_value() == '?':

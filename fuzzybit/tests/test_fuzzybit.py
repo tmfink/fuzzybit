@@ -58,6 +58,9 @@ class TestFuzzyInt(TestCase):
     def assert_history(self, bit_size, history, value):
         self.assertEqual(FuzzyInt(bit_size, history).get_value(), value)
 
+    def assert_history_hex(self, bit_size, history, value):
+        self.assertEqual(FuzzyInt(bit_size, history).get_hex_value(), value)
+
     def test_blank(self):
         self.assert_history(4, [], '????')
 
@@ -90,3 +93,27 @@ class TestFuzzyInt(TestCase):
         self.assertRaises(TypeError, lambda: FuzzyInt(4, -1))
         self.assertRaises(InvalidArgumentException,
                           lambda: FuzzyInt(4, [0b0000, '7000', 0b0100]))
+
+    def test_hist_hex(self):
+        self.assert_history_hex(4, [], '?')
+
+        self.assert_history_hex(4, [0x0], '0')
+        self.assert_history_hex(4, [0x7], '7')
+        self.assert_history_hex(4, [0xa], 'a')
+        self.assert_history_hex(4, [0xf], 'f')
+
+        self.assert_history_hex(4, [0xf, 0x0], '*')
+        self.assert_history_hex(4, [0xf, 0xf], 'f')
+
+        self.assert_history_hex(1, [0x0], '0')
+        self.assert_history_hex(1, [0x1], '1')
+        self.assert_history_hex(1, [0x1, 0x0], '*')
+
+        self.assert_history_hex(2, [0x0, 0x0], '0')
+        self.assert_history_hex(2, [0x1, 0x1], '1')
+
+        self.assert_history_hex(6, [0x00, 0x00], '00')
+        self.assert_history_hex(6, [0x0f, 0x0f], '0f')
+        self.assert_history_hex(6, [0x0f, 0x0c], '0*')
+
+        self.assert_history_hex(8, [0xff, 0xcf], '*f')
