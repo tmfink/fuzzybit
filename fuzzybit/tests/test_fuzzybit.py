@@ -56,7 +56,7 @@ class TestFuzzyInt(TestCase):
     """Tests FuzzyInt class"""
 
     def assert_history(self, bit_size, history, value):
-        self.assertTrue(FuzzyInt(bit_size, history).get_value(), value)
+        self.assertEqual(FuzzyInt(bit_size, history).get_value(), value)
 
     def test_blank(self):
         self.assert_history(4, [], '????')
@@ -67,7 +67,7 @@ class TestFuzzyInt(TestCase):
 
     def test_hist2(self):
         self.assert_history(4, [0b0000, 0b1100], '**00')
-        self.assert_history(4, ['0000', '1100'], '**00')
+        self.assert_history(4, [0b0000, 0b1100], '**00')
         self.assert_history(4, [0b0010, 0b0110], '0*10')
 
     def test_entropy_error(self):
