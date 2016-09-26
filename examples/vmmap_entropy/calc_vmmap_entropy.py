@@ -97,13 +97,24 @@ def get_vmmap_entropy(vmmap_cmd, iterations=5, bit_len=64):
     return vmmap_fuzzy_values, section_names
 
 
-def print_sections_entropy(fuzzy_values, section_names):
+def print_sections_entropy(fuzzy_values, section_names, format=None):
     """Print bit-level entropy of sections"""
+
+    if format is None:
+        format = 'hex'
+
+    def get_value(fuzzy_int):
+        if format == 'hex':
+            return fuzzy_int.get_hex_value()
+        elif format == 'bin':
+            return fuzzy_int.get_value()
+        else:
+            raise Exception('Unknown format "%s"' % format)
 
     for ((start, end), name) in zip(fuzzy_values, section_names):
         print('{start} -> {end}  {name}\n'
               '    entropy: {start_entropy}, {end_entropy} bits'.format(
-                  start=start.get_value(), end=end.get_value(), name=name,
+                  start=get_value(start), end=get_value(end), name=name,
                   start_entropy=start.get_entropy(), end_entropy=end.get_entropy()))
 
 
@@ -115,6 +126,8 @@ def main():
                         help='Number of times to run vmmap command')
     parser.add_argument('--bit-len', '-b', default=64, type=int,
                         help='Number of times to run vmmap command')
+    parser.add_argument('--format', '-f', default='hex', choices=['hex', 'bin'],
+                        help='fuzzyint number format')
     parser.add_argument('command', nargs='+',
                         help='command to run to get instance of vmmap output')
     args = parser.parse_args()
@@ -130,7 +143,7 @@ def main():
         iterations=num_iterations, bit_len=args.bit_len
     )
 
-    print_sections_entropy(fuzzy_values, section_names)
+    print_sections_entropy(fuzzy_values, section_names, format=args.format)
 
 
 if __name__ == '__main__':

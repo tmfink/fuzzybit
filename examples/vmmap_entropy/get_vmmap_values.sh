@@ -5,9 +5,13 @@ if [[ $# -ne 1 ]]; then
     exit 1
 fi
 
+if [[ -z "$GDB" ]]; then
+    GDB=gdb
+fi
+
 BINARY="$1"
 
 filter_word="Start"
 
 # Run binary with GDB and execute commands from entropy-test.gdb
-gdb -x entropy-test.gdb "$BINARY" | grep -A1000 "$filter_word" | grep -v "$filter_word"
+$GDB -x entropy-test.gdb "$BINARY" | grep -A1000 "$filter_word" | grep -v "$filter_word"
